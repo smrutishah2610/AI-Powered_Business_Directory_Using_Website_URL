@@ -1,0 +1,35 @@
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.alert {
+    margin-top: 20px;
+}
+
+.website-card {
+    margin-bottom: 20px;
+}
+
+.btn-group {
+    margin-top: 1rem;
+}
+
+#clearFilters {
+    margin-left: 10px;
+}
+
+.form-control:not(:placeholder-shown),
+.form-select:not([value=""]) {
+    border-color: #0d6efd;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+} 

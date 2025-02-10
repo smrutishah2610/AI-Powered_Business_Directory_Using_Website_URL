@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-from mongoClient import get_all_website_info, get_websites_by_location, get_websites_by_category, check_duplicate_website, collection
+from mongoClient import get_all_website_info, get_websites_by_category, get_websites_by_location, check_duplicate_website, collection
 from main import scrape_and_store
-from bson import json_util
+# from bson import json_util
 from bson.objectid import ObjectId
 
 app = Flask(__name__)

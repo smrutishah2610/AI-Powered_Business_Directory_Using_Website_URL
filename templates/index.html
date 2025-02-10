@@ -71,7 +71,6 @@
                                 <option value="E-commerce">E-commerce</option>
                                 <option value="Telecom">Telecom</option>
                                 <option value="Banking & Finance">Banking & Finance</option>
-                                <option value="IT">IT</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -107,7 +106,10 @@
                             </div>
                             <div class="col-md-3">
                                 <small class="text-muted">
-                                    {{ business.location.city }}, {{ business.location.province }}, {{ business.location.country }}
+                                    <!-- {{ business.location.city }}, {{ business.location.province }}, {{ business.location.country }} -->
+                                    {{ business.location.city if business.location and 'city' in business.location else 'Unknown City' }},
+                                    {{ business.location.province if business.location and 'province' in business.location else 'Unknown Province' }},
+                                    {{ business.location.country if business.location and 'country' in business.location else 'Unknown Country' }}
                                 </small>
                             </div>
                             <div class="col-md-2 text-end">

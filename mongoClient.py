@@ -25,13 +25,13 @@ def save_to_mongodb(url, extracted_data):
 
         data = {
             "url": url,
-            "website_Name": extracted_data.website_name,
-            "contact_number": extracted_data.contact_number1,
+            "website_name": extracted_data.website_name,
+            "contact_number": extracted_data.contact_number,
             "website_description": extracted_data.website_description,
-            "Location": {
+            "location": {
                 "city": extracted_data.city,
                 "province": extracted_data.province,
-                "country": extracted_data.country,
+                "country": extracted_data.country
             },
             "category": extracted_data.category,
         }
@@ -46,7 +46,12 @@ def save_to_mongodb(url, extracted_data):
 def get_all_website_info():
     try:
         # TODO: WRITE SEARCH QUERY
-        return
+        findWebsiteList = collection.find({})
+        formatted_websites = []
+        for site in findWebsiteList:
+            site['location'] = site.get("location", {"city": "Unknown", "province": "Unknown", "country": "Unknown"})
+            formatted_websites.append(site)
+        return formatted_websites
     except Exception as e:
         print(f"Error fetching all websites: {e}")
         return []
@@ -55,16 +60,17 @@ def get_all_website_info():
 def get_websites_by_category(category):
     try:
         # TODO: WRITE SEARCH QUERY
-        return
+        return list(collection.find({"category": category}))
     except Exception as e:
         print(f"Error fetching websites by category: {e}")
         return []
 
 
 def get_websites_by_location(city=None, province=None, country=None):
+    query = {f"location.{key}": value for key, value in [("city", city), ("province", province), ("country", country)] if value}
     try:
         # TODO: WRITE QUERY
-        return
+        return list(collection.find(query))
     except Exception as e:
         print(f"Error fetching websites by location: {e}")
         return []

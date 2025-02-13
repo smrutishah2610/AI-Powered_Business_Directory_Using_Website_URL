@@ -43,6 +43,15 @@ Based on the following indicators:
 
 def extract_info_with_ai(text):
     print(f"Extract the following info from the given text")
+    # return {
+    #     website_name:'Smruti Shah', 
+    #     contact_number:'',
+    #     website_description: 'Data Analyst specializing in data cleaning, analyzing, and visualizing with tools such as SQL, Python, Tableau, and Power BI. Offers services in database management, automation, financial analysis, security, and troubleshooting, with projects in sales data analysis, IT dashboard analysis, ETL pipeline development, AI-powered business directories, and Airbnb data visualization.',
+    #     city: '' ,
+    #     province: '' ,
+    #     country: '' ,
+    #     category: 'IT'
+    # }
     try:
         completion = client.beta.chat.completions.parse(
             model="gpt-4o-2024-08-06",

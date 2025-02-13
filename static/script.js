@@ -3,8 +3,9 @@ $(document).ready(function() {
         e.preventDefault();
         
         const url = $('#urlInput').val();
+        const name = $('#nameInput').val();
         const messageDiv = $('#message');
-        
+        console.log('Listed By Script.js Line 8:',name);
         // Show loading state
         messageDiv.removeClass('alert-danger alert-success')
             .addClass('alert-info')
@@ -14,7 +15,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/scrape',
             method: 'POST',
-            data: { url: url },
+            data: { url: url, name: name },
             success: function(response) {
                 messageDiv.removeClass('alert-danger alert-info')
                     .addClass('alert-success')
@@ -102,6 +103,7 @@ $(document).ready(function() {
     // Register business handler
     $('#registerButton').click(function() {
         const url = $('#businessUrl').val();
+        const listed_by = $('#listed_by').val();
         const statusDiv = $('#registerStatus');
         
         statusDiv.removeClass('alert-danger alert-success')
@@ -112,7 +114,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/scrape',
             method: 'POST',
-            data: { url: url },
+            data: { url: url, listed_by: listed_by },
             success: function(response) {
                 statusDiv.removeClass('alert-info alert-danger')
                     .addClass('alert-success')
@@ -153,6 +155,13 @@ $(document).ready(function() {
                         <div class="col-md-3"><strong>Website:</strong></div>
                         <div class="col-md-9">
                             <a href="${business.url}" target="_blank">${business.url}</a>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Website Added By:</strong></div>
+                        <div class="col-md-9">
+                            ${business.listed_by}
                         </div>
                     </div>
 

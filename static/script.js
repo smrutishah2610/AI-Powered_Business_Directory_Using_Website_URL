@@ -27,7 +27,7 @@ $(document).ready(function() {
                     .show();
                     
                 // Redirect to websites page after 2 seconds
-                setTimeout(() => window.location.href = '/websites', 2000);
+                setTimeout(() => window.location.href = '/business', 2000);
             },
             error: function(xhr) {
                 const error = xhr.responseJSON ? xhr.responseJSON.error : 'An error occurred';
@@ -116,7 +116,7 @@ $(document).ready(function() {
             .show();
         
         $.ajax({
-            url: '/business/scrape',
+            url: '/business',
             method: 'POST',
             data: { url: url, listed_by: listed_by },
             success: function(response) {

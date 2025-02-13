@@ -16,6 +16,7 @@ def check_duplicate_website(url):
 
 
 def save_to_mongodb(url, listed_by, extracted_data):
+    print('Start: Save Record to MongoDB')
     if extracted_data is None:
         print(f"Warning: No data extracted for URL: {url}")
         return False, "No data extracted"
@@ -25,25 +26,26 @@ def save_to_mongodb(url, listed_by, extracted_data):
         if check_duplicate_website(url):
             return False, "This business is already registered"
 
+        print(f'Data?', extracted_data['website_name'])
         data = {
             "url": url,
             "listed_by": listed_by,
-            "website_name": extracted_data.website_name,
-            "contact_number": extracted_data.contact_number,
-            "website_description": extracted_data.website_description,
+            "website_name": extracted_data['website_name'],
+            "contact_number": extracted_data['contact_number'],
+            "website_description": extracted_data['website_description'],
             "location": {
-                "city": extracted_data.city,
-                "province": extracted_data.province,
-                "country": extracted_data.country
+                "city": extracted_data['city'],
+                "province": extracted_data['province'],
+                "country": extracted_data['country']
             },
-            "category": extracted_data.category
+            "category": extracted_data['category']
         }
         
         print('listed by in mongoClient Line 40: ', listed_by)
         collection.insert_one(data)
         return True, "Business registered successfully"
     except Exception as e:
-        print(f"Error saving to MongoDB: {e}")
+        print(f"Error: Save Record to MongoDB: {e}")
         return False, str(e)
 
 

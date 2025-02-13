@@ -6,13 +6,13 @@ from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/business')
 def home():
     # Get all businesses for the listing
     businesses = get_all_website_info()
     return render_template('index.html', businesses=businesses)
 
-@app.route('/scrape', methods=['POST'])
+@app.route('/business/scrape', methods=['POST'])
 def scrape_website():
     try:
         # TODO: PASS NAME AND URL IN THE BODY PARAMS
@@ -28,7 +28,7 @@ def scrape_website():
         
         # TODO: PASS THE BODY TO THE SCRAPE AND STORE THE NAME WITH THE URL
         success = scrape_and_store(url, listed_by)
-        
+        print('successfully scrape!',success)
         if success:
             return jsonify({"message": "Business registered successfully"})
         return jsonify({"error": "Failed to register business"}), 500
@@ -37,7 +37,7 @@ def scrape_website():
         print(f"Error in scrape_website route: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/websites')
+@app.route('/business/websites')
 def get_websites():
     try:
         # TODO: LEARN DIFFERENCE BETWEEN QUERY AND PARAMS FOR GET REQUEST

@@ -42,16 +42,17 @@ Based on the following indicators:
 
 
 def extract_info_with_ai(text):
-    print(f"Extract the following info from the given text")
-    # return {
-    #     website_name:'Smruti Shah', 
-    #     contact_number:'',
-    #     website_description: 'Data Analyst specializing in data cleaning, analyzing, and visualizing with tools such as SQL, Python, Tableau, and Power BI. Offers services in database management, automation, financial analysis, security, and troubleshooting, with projects in sales data analysis, IT dashboard analysis, ETL pipeline development, AI-powered business directories, and Airbnb data visualization.',
-    #     city: '' ,
-    #     province: '' ,
-    #     country: '' ,
-    #     category: 'IT'
-    # }
+    print(f"Start: Extract the following info from the given text")
+    extracted_data = {
+        "website_name":'Smruti Shah', 
+        "contact_number":'',
+        "website_description": 'Data Analyst specializing in data cleaning, analyzing, and visualizing with tools such as SQL, Python, Tableau, and Power BI. Offers services in database management, automation, financial analysis, security, and troubleshooting, with projects in sales data analysis, IT dashboard analysis, ETL pipeline development, AI-powered business directories, and Airbnb data visualization.',
+        "city": '' ,
+        "province": '' ,
+        "country": '' ,
+        "category": 'IT'
+    }
+    return extracted_data
     try:
         completion = client.beta.chat.completions.parse(
             model="gpt-4o-2024-08-06",
@@ -65,13 +66,22 @@ def extract_info_with_ai(text):
             response_format=websiteInformation,
         )
 
-        print(completion)
-
         # Extract JSON-formatted response
-        extracted_data = completion.choices[0].message.parsed
+        response = completion.choices[0].message.parsed
+        extracted_data = {
+            "website_name":response.website_name, 
+            "contact_number":response.contact_number,
+            "website_description": response.website_description,
+            "city": response.city,
+            "province": response.province ,
+            "country": response.country,
+            "category": response.category
+        }
 
     except json.JSONDecodeError:
         print("Error: OpenAI response is not valid JSON")
         extracted_data = {}
 
+    print('Finish: Extract Data')
+    print(extracted_data)
     return extracted_data  # Returning JSON dictionary

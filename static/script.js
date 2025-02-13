@@ -13,7 +13,7 @@ $(document).ready(function() {
             .show();
         
         $.ajax({
-            url: '/scrape',
+            url: '/business/scrape',
             method: 'POST',
             data: { url: url, name: name },
             success: function(response) {
@@ -45,7 +45,7 @@ $(document).ready(function() {
         $('#businessList').html('<div class="text-center mt-4"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>');
         
         // Fetch filtered results
-        $.get('/websites?' + formData, function(response) {
+        $.get('/business/websites?' + formData, function(response) {
             // Parse the HTML response and extract the business list
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = response;
@@ -112,7 +112,7 @@ $(document).ready(function() {
             .show();
         
         $.ajax({
-            url: '/scrape',
+            url: '/business/scrape',
             method: 'POST',
             data: { url: url, listed_by: listed_by },
             success: function(response) {

@@ -6,12 +6,14 @@ from mongoClient import save_to_mongodb
 
 def fetch_website_text(url):
     try:
+        print('Start: Get Website Text')
         headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.delete(url, headers=headers, timeout=10)
-        
+        response = requests.get(url, headers=headers, timeout=50)
+        print(response)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")
             text = soup.get_text(separator=" ", strip=True)
+            print('Finish: Get Website Text')
             return text
         else:
             print(f"Failed to fetch {url}, Status Code: {response.status_code}")
@@ -23,6 +25,7 @@ def fetch_website_text(url):
 def scrape_and_store(url, listed_by):
     try:
         html = fetch_website_text(url)
+        print('Processing: Received website data')
         if not html:
             print("Failed to fetch website text")
             return False

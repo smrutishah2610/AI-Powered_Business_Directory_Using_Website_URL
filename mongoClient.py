@@ -23,8 +23,11 @@ def save_to_mongodb(url, listed_by, extracted_data):
     
     try:
         # Check for duplicate
+        print('Start: Check for duplication')
         if check_duplicate_website(url):
+            print('Process: Check for duplication')
             return False, "This business is already registered"
+        print('End: Check for duplication')
 
         print(f'Data?', extracted_data['website_name'])
         data = {

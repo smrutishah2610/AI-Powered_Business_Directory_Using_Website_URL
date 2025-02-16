@@ -27,4 +27,28 @@
  *  - URL, METHOR_TYPE, PARAMS OR BODY DEPENDS ON THE TYPE OF THE REQUEST
  */
 
+const { response } = require("express");
 
+
+/* 
+1. GET LIST
+      - URL:
+      - METHOD_TYPE: 
+      - PARAMS/QUERY/BODY? 
+      - RESPONSE OBJECT (CONSOLE.LOG) 
+*/
+
+fetch('/business').then(response=> {
+    console.log('Start: Fetching response through javascript');
+    if (response.ok){
+        return response.json();
+    } else {
+        throw new Error('API request failed!');
+    }
+}).then(data=> {
+    console.log('Process: Fetching response through javascript');
+    console.log(data);
+}).catch(error => {
+    console.log('Error: Fetching response through javascript');
+    console.log(error);
+});

@@ -5,7 +5,7 @@ from mongoClient import (
     get_websites_by_category,
     get_websites_by_location,
     check_duplicate_website,
-    collection,
+    collection, credentials_collection
 )
 from main import scrape_and_store
 
@@ -92,6 +92,20 @@ def profile():
 def admin():
     return "<h1 style='color:red'>'This is admin'</h1>"
 
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    if credentials_collection.find_one({"username": username}):
+        return jsonify({"message": "User already exists"}), 400
+
+    # hashed_password = generate_password_hash(password, method='sha256')
+    credentials_collection.insert_one({"username": username, "password": password})
+    return jsonify({"message": "User registered successfully"}), 200
+
+    
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

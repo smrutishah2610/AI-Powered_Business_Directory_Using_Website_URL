@@ -6,6 +6,7 @@ from api import websiteInformation
 client = MongoClient("localhost", 27017)
 db = client["test"]
 collection = db["testUI"]
+credentials_collection = db["credentials"]
 
 
 def check_duplicate_website(url):
@@ -106,3 +107,6 @@ def get_websites_by_location(city=None, province=None, country=None):
     except Exception as e:
         print(f"Error fetching websites by location: {e}")
         return []
+
+# def get_register_user():
+#     return

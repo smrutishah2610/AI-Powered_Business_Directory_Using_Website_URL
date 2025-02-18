@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    alert("ready...");
+    // alert("ready...");
 
     function loadBusiness() {
         console.log("Start: Load Business");
@@ -10,7 +10,7 @@ $(document).ready(function () {
             success: function (response) {
                 console.log("Received Data");
                 console.log(response);
-                alert('Update html')
+                // alert('Update html')
                 // LOAD HTML TABLE FORMAT VIEW AND USE response
                 // If you want to use the businesses data directly
                 if (response && response.length > 0) {
@@ -91,7 +91,7 @@ $(document).ready(function () {
     // Filter form handler
     $("#filterForm").on("submit", function (e) {
         e.preventDefault();
-
+        console.log('Start: filtering form');
         const formData = $(this).serialize();
 
         // Show loading state
@@ -100,10 +100,11 @@ $(document).ready(function () {
         );
 
         // Fetch filtered results
-        $.get("/business?" + formData, function (response) {
+        $.get("http://127.0.0.1:5000/business?" + formData, function (response) {
             // Parse the HTML response and extract the business list
             const tempDiv = document.createElement("div");
             tempDiv.innerHTML = response;
+            console.log('Process: filtering form',tempDiv);
             const newBusinessList = tempDiv.querySelector("#businessList").innerHTML;
             $("#businessList").html(newBusinessList);
         }).fail(function () {
@@ -115,6 +116,7 @@ $(document).ready(function () {
 
     // Clear filters
     $("#clearFilters").click(function () {
+        console.log('Start: Clearing filter');
         $("#categoryFilter").val("");
         $("#cityFilter").val("");
         $("#provinceFilter").val("");

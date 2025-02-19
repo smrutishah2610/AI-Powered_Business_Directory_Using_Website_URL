@@ -8,13 +8,16 @@ from mongoClient import (
     collection, credentials_collection
 )
 from main import scrape_and_store
+import tkinter as tk
+
+
 
 # from bson import json_util
 from bson.objectid import ObjectId
 
 app = Flask(__name__)
 print("Start: app")
-CORS(app, origins=["http://127.0.0.1:5500"])  # Allow only this origin
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow only this origin
 # cors = CORS(app)
 
 @app.route("/business")
@@ -52,10 +55,11 @@ def scrape_website():
         print(f"Error in scrape_website route: {e}")
         return jsonify({"error": str(e)}), 500
 
-
+# View Details
 @app.route("/business/details/<business_id>")
 def business_details(business_id):
     # TODO: QUERY OR PARAMS?
+    print("Process: Fetching Business Details")
     try:
         business = collection.find_one({"_id": ObjectId(business_id)})
         # TODO: DON"T PASS PHONE NUMBER INSTEAD OF PASS 0000000000 FIXED
@@ -72,15 +76,39 @@ def business_details(business_id):
         print(f"Error fetching business details: {e}")
         return render_template("index.html", error="Failed to load business details")
 
-
+# Delete Business
+@app.route("/business/delete/<business_id>", methods=["DELETE"])
+def delete_business(business_id):
+    # print('Process: Start deleting ', business_id)
+    try:
+        business = collection.find_one({"_id": ObjectId(business_id)});
+        if business:
+            business["_id"] = str(business["_id"])
+            collection.delete_one({"_id": ObjectId(business_id)});
+            return jsonify({"success": "Delete successfully!"}), 200;
+            
+        return jsonify({"error": "Business not found"}), 404
+    except Exception as e:
+        return jsonify({"error": "Failed to load business details"}), e
+        
+@app.route('/business/edit/<business_id>', methods=["POST"])
+def edit_businessInfo(business_id):
+    try:
+        return jsonify({"success": "Info updated Successfully!"});
+    except Exception as e:
+        return jsonify({"error": "Failed to update business info"});
+    
+    
 @app.route("/")
 def index():
     return render_template(
         "index.html", businesses=get_all_website_info(request)
     )
-    # businesses = get_all_website_info(request)
-    # print("Finish: Get Businesses", businesses)
-    # return businesses
+#     # businesses = get_all_website_info(request)
+#     # print("Finish: Get Businesses", businesses)
+#     # return businesses
+#     print('Process: App')
+#     return redirect('/business')
 
 
 @app.route("/profile")
@@ -108,4 +136,4 @@ def register():
     
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True)

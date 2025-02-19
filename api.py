@@ -45,11 +45,11 @@ def extract_info_with_ai(text):
     print(f"Start: Extract the following info from the given text")
     extracted_data = {
         "website_name":'Smruti Shah', 
-        "contact_number":'',
+        "contact_number":'647-472-2601',
         "website_description": 'Data Analyst specializing in data cleaning, analyzing, and visualizing with tools such as SQL, Python, Tableau, and Power BI. Offers services in database management, automation, financial analysis, security, and troubleshooting, with projects in sales data analysis, IT dashboard analysis, ETL pipeline development, AI-powered business directories, and Airbnb data visualization.',
-        "city": '' ,
-        "province": '' ,
-        "country": '' ,
+        "city": 'Mississauga' ,
+        "province": 'ON' ,
+        "country": 'Canada' ,
         "category": 'IT'
     }
     return extracted_data

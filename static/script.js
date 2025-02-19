@@ -19,7 +19,7 @@ $(document).ready(function () {
                         $("#businessList").append(`
                             <div class="card mb-3">
                                 <div class="card-body">
-                                    <h5 class="card-title">${business.website_name}</h5>
+                                    <h5 class="card-title">${business.listed_by}</h5>
                                     <p class="card-text">${business.category}</p>
                                     <small class="text-muted">${business.location.city}, ${business.location.province}, ${business.location.country}</small>
                                     
@@ -28,6 +28,12 @@ $(document).ready(function () {
                                     <button class="btn btn-sm btn-outline-primary view-details" data-business-id="${business._id}">
                                         View Details
                                     </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-details" data-business-id="${business._id}">
+                                        Delete Details
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success edit-details" data-business-id="${business._id}">
+                                        Edit Details
+                                    </button>
                                 </div>
                             </div>
                         `);
@@ -35,6 +41,13 @@ $(document).ready(function () {
                 } else {
                     $("#businessList").html('<div class="alert alert-info">No businesses found.</div>');
                 }
+                // Redirect to websites page after 3 seconds
+                // setTimeout(() => {
+                //     fetch('http://127.0.0.1:5000/business')
+                //         .then(response => response.json())
+                //         .then(data => console.log(data))
+                //         .catch(error => console.error("Error:", error));
+                // }, 3000);
             },
             error: function (xhr) {
                 const error = xhr.responseJSON
@@ -72,8 +85,16 @@ $(document).ready(function () {
                     .text(response.message)
                     .show();
 
-                // Redirect to websites page after 2 seconds
-                setTimeout(() => (window.location.href = "/business"), 2000);
+                // Redirect to websites page after 3 seconds
+                alert("Start: Server");
+                setTimeout(() => {
+                    alert("Process: Server");
+                    fetch('http://127.0.0.1:5000/business')
+                        .then(response => response.json())
+                        .then(data => console.log(data))
+                        .catch(error => console.error("Error:", error));
+                }, 3000);
+                alert("end: Server");
             },
             error: function (xhr) {
                 const error = xhr.responseJSON
@@ -161,7 +182,7 @@ $(document).ready(function () {
     highlightActiveFilters();
 
     // Register business handler
-    $("#registerButton").click(function () {
+    $("#registerBusiness").click(function () {
         const url = $("#businessUrl").val();
         const listed_by = $("#listed_by").val();
         const statusDiv = $("#registerStatus");
@@ -214,6 +235,7 @@ $(document).ready(function () {
             '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Loading...</div></div>'
         );
         console.log('process: viewDeatils function');
+        console.log('Business_id: ',businessId);
         // Update the URL to match the Flask route for business details
         $.get(`http://127.0.0.1:5000/business/details/${businessId}`, function (response) {
             
@@ -284,37 +306,52 @@ $(document).ready(function () {
         });
     }
     
+    // Delete Business - Button
+    $(document).on("click", ".delete-details", function() {
+        const businessId = $(this).data("business-id"); // Get the business ID from the button
+        console.log("Business ID:", businessId); // Log the business ID for debugging
+        deleteDetails(businessId); // Pass the businessId to the viewDeatils function
+    });
+
+    function deleteDetails(businessId) {
+        console.log(`Start: deleting details of ${businessId}`);
+        
+        $('#businessDetails').html(
+            '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Loading...</div></div>'
+        );
+        console.log(`Process: deleting details of ${businessId}`);
+
+        // Show confirmation dialog
+        if (confirm('Are you sure you want to delete this business?')) {
+            $.ajax({
+                url: `http://127.0.0.1:5000/business/delete/${businessId}`,
+                method: "DELETE", // Use DELETE method for deletion
+                success: function (response) {
+                    console.log("Response:", response);
+                    // Handle successful deletion
+                    alert('Business deleted successfully!');
+                    $("#businessList").html('');
+                    loadBusiness();
+                },
+                error: function (xhr) {
+                    console.error("Error deleting business:", xhr);
+                    alert('Failed to delete business. Please try again later.');
+                }
+            });
+        } else {
+            console.log("Delete cancelled by user.");
+            alert('Deletion cancelled!');
+        }
+    }
+
+    // EDIT Business - Button
+    $(document).on("click", ".edit-details", function() {
+        const businessId = $(this).data("business-id"); // Get the business ID from the button
+        console.log("Business ID:", businessId); // Log the business ID for debugging
+        editDetails(businessId); // Pass the businessId to the viewDeatils function
+    });
+
+    function editDetails(businessId){
+        console.log('Start: editing business information!');
+    }
 });
-/* 
-{% if businesses %}
-                {% for business in businesses %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-4">
-                                <h5 class="card-title mb-0">{{ business.website_name }}</h5>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="badge bg-primary">{{ business.category }}</span>
-                            </div>
-                            <div class="col-md-3">
-                                <small class="text-muted">
-                                    <!-- {{ business.location.city }}, {{ business.location.province }}, {{ business.location.country }} -->
-                                    {{ business.location.city if business.location and 'city' in business.location else 'Unknown City' }},
-                                    {{ business.location.province if business.location and 'province' in business.location else 'Unknown Province' }},
-                                    {{ business.location.country if business.location and 'country' in business.location else 'Unknown Country' }}
-                                </small>
-                            </div>
-                            <div class="col-md-2 text-end">
-                                <a href="/business/details/{{ business._id }}" class="btn btn-sm btn-outline-primary">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="alert alert-info">No businesses found matching your criteria.</div>
-            {% endif %}
-*/

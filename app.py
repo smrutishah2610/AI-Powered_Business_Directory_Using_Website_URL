@@ -148,7 +148,8 @@ def register():
     password = data.get('password')
 
     if credentials_collection.find_one({"username": username}):
-        return jsonify({"message": "User already exists"}), 400
+        jsonify({"message": "User already exists"});
+        return redirect('/business');
 
     # hashed_password = generate_password_hash(password, method='sha256')
     credentials_collection.insert_one({"username": username, "password": password})

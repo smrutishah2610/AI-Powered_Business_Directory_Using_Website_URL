@@ -141,9 +141,10 @@ $(document).ready(function () {
 
     // Filter form handler
     $("#filterForm").on("submit", function (e) {
-        e.preventDefault();
+        e.preventDefault(); // Prevent the default form submission
         console.log("Start: filtering form");
-        const formData = $(this).serialize();
+        
+        const formData = $(this).serialize(); // Serialize the form data
 
         // Show loading state
         $("#businessList").html(
@@ -152,12 +153,44 @@ $(document).ready(function () {
 
         // Fetch filtered results
         $.get("http://127.0.0.1:5000/business?" + formData, function (response) {
-            // Parse the HTML response and extract the business list
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = response;
-            console.log("Process: filtering form", tempDiv);
-            const newBusinessList = tempDiv.querySelector("#businessList").innerHTML;
-            $("#businessList").html(newBusinessList);
+            console.log("Response from server:", response); // Log the response
+
+            // Clear the current business list
+            $("#businessList").html("");
+
+            // Check if response is an array
+            if (Array.isArray(response) && response.length > 0) {
+                response.forEach(business => {
+                    const businessHTML = `
+                        <div class="card mb-3" data-business-id="${business._id}" 
+                             data-phone-number="${business.contact_number}" 
+                             data-url="${business.url}" 
+                             data-listed-by="${business.listed_by}" 
+                             data-category="${business.category}" 
+                             data-description="${business.website_description}" 
+                             data-location='${JSON.stringify(business.location)}'>
+                            <div class="card-body">
+                                <h5 class="card-title">${business.website_name}</h5>
+                                <small class="text-muted">${business.location.city}, ${business.location.province}, ${business.location.country}</small>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-outline-primary view-details" data-business-id="${business._id}">
+                                    View Details
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-details" data-business-id="${business._id}">
+                                    Delete Details
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="editButton('${business._id}')">
+                                    Edit Details
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    $("#businessList").append(businessHTML); // Append the new business card
+                });
+            } else {
+                $("#businessList").html('<div class="alert alert-warning">No businesses found matching the criteria.</div>');
+            }
         }).fail(function () {
             $("#businessList").html(
                 '<div class="alert alert-danger">Failed to load filtered results</div>'
@@ -390,11 +423,11 @@ $(document).ready(function () {
         const listedBy = $("#editListedBy").val();
         const phoneNumber = $("#editPhone").val();
         // Create location object
-    const location = {
-        city: $("#editLocation").val().split(", ")[0], // Assuming the format is "City, Province"
-        province: $("#editLocation").val().split(", ")[1], // Extract province
-        country: "Canada" // Adjust as necessary
-    };
+        const location = {
+            city: $("#editLocation").val().split(", ")[0], // Assuming the format is "City, Province"
+            province: $("#editLocation").val().split(", ")[1], // Extract province
+            country: "Canada" // Adjust as necessary
+        };
         const category = $("#editCategory").val();
         const description = $("#editDescription").val();
 
@@ -426,4 +459,34 @@ $(document).ready(function () {
             }
         });
     });
+
+    function loadLocationFilters() {
+        $.get("http://127.0.0.1:5000/business", function (response) {
+            const cities = new Set();
+            const provinces = new Set();
+            const countries = new Set();
+
+            response.forEach(business => {
+                cities.add(business.location.city);
+                provinces.add(business.location.province);
+                countries.add(business.location.country);
+            });
+
+            // Populate dropdowns
+            populateDropdown("#cityFilter", Array.from(cities));
+            populateDropdown("#provinceFilter", Array.from(provinces));
+            populateDropdown("#countryFilter", Array.from(countries));
+        });
+    }
+
+    function populateDropdown(selector, options) {
+        const dropdown = $(selector);
+        dropdown.empty(); // Clear existing options
+        dropdown.append('<option value="">Select</option>'); // Default option
+        options.forEach(option => {
+            dropdown.append(`<option value="${option}">${option}</option>`);
+        });
+    }
+
+    loadLocationFilters();
 });

@@ -91,12 +91,33 @@ def delete_business(business_id):
     except Exception as e:
         return jsonify({"error": "Failed to load business details"}), e
         
-@app.route('/business/edit/<business_id>', methods=["POST"])
-def edit_businessInfo(business_id):
+@app.route('/business/edit/<business_id>', methods=["PUT"])
+def edit_business_info(business_id):
     try:
-        return jsonify({"success": "Info updated Successfully!"});
+        data = request.json
+        url = data.get("url")
+        listed_by = data.get("listed_by")
+        phone_number = data.get("phone_number")
+        location = data.get("location")
+        category = data.get("category")
+        description = data.get("description")
+
+        # Update the business in the database
+        collection.update_one(
+            {"_id": ObjectId(business_id)},
+            {"$set": {
+                "url": url,
+                "listed_by": listed_by,
+                "contact_number": phone_number,
+                "location": location,
+                "category": category,
+                "website_description": description
+            }}
+        )
+
+        return jsonify({"success": "Business updated successfully!"}), 200
     except Exception as e:
-        return jsonify({"error": "Failed to update business info"});
+        return jsonify({"error": "Failed to update business info"}), 500
     
     
 @app.route("/")

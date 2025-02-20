@@ -1,6 +1,8 @@
 $(document).ready(function () {
     // alert("ready...");
 
+
+
     function loadBusiness() {
         console.log("Start: Load Business");
 
@@ -17,9 +19,9 @@ $(document).ready(function () {
                     response.forEach(function (business) {
                         // Update your HTML with the business data
                         $("#businessList").append(`
-                            <div class="card mb-3">
+                            <div class="card mb-3" data-business-id="${business._id}" data-url="${business.url}" data-contact-number="${business.contact_number}" data-location='${business.location}' data-category="${business.category}" data-description="${business.website_description}" data-listed-by="${business.listed_by}">
                                 <div class="card-body">
-                                    <h5 class="card-title">${business.listed_by}</h5>
+                                    <h5 class="card-title">${business.website_name}</h5>
                                     <p class="card-text">${business.category}</p>
                                     <small class="text-muted">${business.location.city}, ${business.location.province}, ${business.location.country}</small>
                                     
@@ -31,7 +33,7 @@ $(document).ready(function () {
                                     <button class="btn btn-sm btn-outline-danger delete-details" data-business-id="${business._id}">
                                         Delete Details
                                     </button>
-                                    <button class="btn btn-sm btn-outline-success edit-details" data-business-id="${business._id}">
+                                    <button class="btn btn-sm btn-outline-success" data-business-id="${business._id}" onclick="editButton('${business._id}')">
                                         Edit Details
                                     </button>
                                 </div>
@@ -39,7 +41,9 @@ $(document).ready(function () {
                         `);
                     });
                 } else {
-                    $("#businessList").html('<div class="alert alert-info">No businesses found.</div>');
+                    $("#businessList").html(
+                        '<div class="alert alert-info">No businesses found.</div>'
+                    );
                 }
                 // Redirect to websites page after 3 seconds
                 // setTimeout(() => {
@@ -59,12 +63,38 @@ $(document).ready(function () {
 
     loadBusiness();
 
+    // Function to handle the edit button click
+    window.editButton = function (businessId) {
+        console.log("Edit button clicked for business ID:", businessId);
+
+        // Find the business card using the business ID
+        const businessCard = $(`[data-business-id='${businessId}']`);
+        // Log the business card to see if it's found
+        console.log("Business Card:", businessCard);
+        console.log("website-added-by:", businessCard.data("listed-by")); // Log the location
+
+        // Populate the modal fields with existing data
+        $("#editBusinessId").val(businessId);
+
+        $("#editUrl").val(businessCard.data('url')); // URL
+        $("#editWebsiteName").val(businessCard.find('.card-title').text());
+        $("#editListedBy").val(businessCard.data('listed-by')); // Listed By
+        $("#editPhone").val(businessCard.data("contact-number")); // Phone Number
+        $("#editLocation").val(businessCard.find(".text-muted").text()); // Location
+
+        $("#editCategory").val(businessCard.data("category")); // Category
+        $("#editDescription").val(businessCard.data("description")); 
+        console.log( $("#editDescription").val(businessCard.data("description")));
+
+        // Show the modal
+        $('#editModal').modal('show');
+    };
     $("#scrapeForm").on("submit", function (e) {
         e.preventDefault();
-        console.log('Start: Scrape Form');
+        console.log("Start: Scrape Form");
         const url = $("#urlInput").val();
         const name = $("#nameInput").val();
-        console.log('Process: Scrape Form, url:',url,' and name: ', name);
+        console.log("Process: Scrape Form, url:", url, " and name: ", name);
         const messageDiv = $("#message");
         console.log("Process: Scrape Form, name: ", name);
         // Show loading state
@@ -75,7 +105,7 @@ $(document).ready(function () {
             .show();
 
         $.ajax({
-            url: "/business",
+            url: "http://127.0.0.1:5000/business",
             method: "POST",
             data: { url: url, name: name },
             success: function (response) {
@@ -89,10 +119,10 @@ $(document).ready(function () {
                 alert("Start: Server");
                 setTimeout(() => {
                     alert("Process: Server");
-                    fetch('http://127.0.0.1:5000/business')
-                        .then(response => response.json())
-                        .then(data => console.log(data))
-                        .catch(error => console.error("Error:", error));
+                    fetch("http://127.0.0.1:5000/business")
+                        .then((response) => response.json())
+                        .then((data) => console.log(data))
+                        .catch((error) => console.error("Error:", error));
                 }, 3000);
                 alert("end: Server");
             },
@@ -112,7 +142,7 @@ $(document).ready(function () {
     // Filter form handler
     $("#filterForm").on("submit", function (e) {
         e.preventDefault();
-        console.log('Start: filtering form');
+        console.log("Start: filtering form");
         const formData = $(this).serialize();
 
         // Show loading state
@@ -125,7 +155,7 @@ $(document).ready(function () {
             // Parse the HTML response and extract the business list
             const tempDiv = document.createElement("div");
             tempDiv.innerHTML = response;
-            console.log('Process: filtering form',tempDiv);
+            console.log("Process: filtering form", tempDiv);
             const newBusinessList = tempDiv.querySelector("#businessList").innerHTML;
             $("#businessList").html(newBusinessList);
         }).fail(function () {
@@ -137,7 +167,7 @@ $(document).ready(function () {
 
     // Clear filters
     $("#clearFilters").click(function () {
-        console.log('Start: Clearing filter');
+        console.log("Start: Clearing filter");
         $("#categoryFilter").val("");
         $("#cityFilter").val("");
         $("#provinceFilter").val("");
@@ -217,39 +247,40 @@ $(document).ready(function () {
             },
         });
     });
-    
-    console.log('Start: Perform Click event function');
+
+    console.log("Start: Perform Click event function");
     // Attach click event handler for view-details buttons
-    $(document).on("click", ".view-details", function() {
+    $(document).on("click", ".view-details", function () {
         const businessId = $(this).data("business-id"); // Get the business ID from the button
         console.log("Business ID:", businessId); // Log the business ID for debugging
         viewDeatils(businessId); // Pass the businessId to the viewDeatils function
     });
-    
+
     // View details handler
     function viewDeatils(businessId) {
-        console.log('Start: viewDeatils function');
+        console.log("Start: viewDeatils function");
         const detailsDiv = $("#businessDetails");
 
         detailsDiv.html(
             '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Loading...</div></div>'
         );
-        console.log('process: viewDeatils function');
-        console.log('Business_id: ',businessId);
+        console.log("process: viewDeatils function");
+        console.log("Business_id: ", businessId);
         // Update the URL to match the Flask route for business details
-        $.get(`http://127.0.0.1:5000/business/details/${businessId}`, function (response) {
-            
-            console.log("Response:", response); // Log the response for debugging
-            if (typeof response === 'string') {
-                response = JSON.parse(response); // Ensure it's an object
-            }
-            if (response) {
-                // Parse the response if it's a string
-                // const business = typeof response === 'string' ? JSON.parse(response) : response;
-                console.log("Response keys:", Object.keys(response));
-                console.log("Full Response:", response);
+        $.get(
+            `http://127.0.0.1:5000/business/details/${businessId}`,
+            function (response) {
+                console.log("Response:", response); // Log the response for debugging
+                if (typeof response === "string") {
+                    response = JSON.parse(response); // Ensure it's an object
+                }
+                if (response) {
+                    // Parse the response if it's a string
+                    // const business = typeof response === 'string' ? JSON.parse(response) : response;
+                    console.log("Response keys:", Object.keys(response));
+                    console.log("Full Response:", response);
 
-                detailsDiv.html(`
+                    detailsDiv.html(`
                     <div class="container">
                         <div class="row mb-3">
                             <div class="col">
@@ -259,7 +290,8 @@ $(document).ready(function () {
                         <div class="row mb-3">
                             <div class="col-md-3"><strong>Website:</strong></div>
                             <div class="col-md-9">
-                                <a href="${response.url}" target="_blank">${response.url}</a>
+                                <a href="${response.url}" target="_blank">${response.url
+                        }</a>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -269,33 +301,39 @@ $(document).ready(function () {
                         <div class="row mb-3">
                             <div class="col-md-3"><strong>Category:</strong></div>
                             <div class="col-md-9">
-                                <span class="badge bg-primary">${response.category}</span>
+                                <span class="badge bg-primary">${response.category
+                        }</span>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-3"><strong>Contact:</strong></div>
-                            <div class="col-md-9">${response.contact_number || "Not available"}</div>
+                            <div class="col-md-9">${response.contact_number || "Not available"
+                        }</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-3"><strong>Location:</strong></div>
-                            <div class="col-md-9">${response.location.city}, ${response.location.province}, ${response.location.country}</div>
+                            <div class="col-md-9">${response.location.city}, ${response.location.province
+                        }, ${response.location.country}</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-3"><strong>Description:</strong></div>
-                            <div class="col-md-9">${response.website_description || "No description available"}</div>
+                            <div class="col-md-9">${response.website_description ||
+                        "No description available"
+                        }</div>
                         </div>
                     </div>
                 `);
-                $('#detailsModal').modal('show'); // Show the modal
-            } else {
-                detailsDiv.html(`
+                    $("#detailsModal").modal("show"); // Show the modal
+                } else {
+                    detailsDiv.html(`
                     <div class="alert alert-danger">
                         <i class="fas fa-exclamation-circle"></i>
                         Business details not found.
                     </div>
                 `);
+                }
             }
-        }).fail(function (xhr) {
+        ).fail(function (xhr) {
             console.error("Error fetching business details:", xhr); // Log the error for debugging
             detailsDiv.html(`
                 <div class="alert alert-danger">
@@ -305,9 +343,9 @@ $(document).ready(function () {
             `);
         });
     }
-    
+
     // Delete Business - Button
-    $(document).on("click", ".delete-details", function() {
+    $(document).on("click", ".delete-details", function () {
         const businessId = $(this).data("business-id"); // Get the business ID from the button
         console.log("Business ID:", businessId); // Log the business ID for debugging
         deleteDetails(businessId); // Pass the businessId to the viewDeatils function
@@ -315,43 +353,77 @@ $(document).ready(function () {
 
     function deleteDetails(businessId) {
         console.log(`Start: deleting details of ${businessId}`);
-        
-        $('#businessDetails').html(
+
+        $("#businessDetails").html(
             '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Loading...</div></div>'
         );
         console.log(`Process: deleting details of ${businessId}`);
 
         // Show confirmation dialog
-        if (confirm('Are you sure you want to delete this business?')) {
+        if (confirm("Are you sure you want to delete this business?")) {
             $.ajax({
                 url: `http://127.0.0.1:5000/business/delete/${businessId}`,
                 method: "DELETE", // Use DELETE method for deletion
                 success: function (response) {
                     console.log("Response:", response);
                     // Handle successful deletion
-                    alert('Business deleted successfully!');
-                    $("#businessList").html('');
+                    alert("Business deleted successfully!");
+                    $("#businessList").html("");
                     loadBusiness();
                 },
                 error: function (xhr) {
                     console.error("Error deleting business:", xhr);
-                    alert('Failed to delete business. Please try again later.');
-                }
+                    alert("Failed to delete business. Please try again later.");
+                },
             });
         } else {
             console.log("Delete cancelled by user.");
-            alert('Deletion cancelled!');
+            alert("Deletion cancelled!");
         }
     }
 
-    // EDIT Business - Button
-    $(document).on("click", ".edit-details", function() {
-        const businessId = $(this).data("business-id"); // Get the business ID from the button
-        console.log("Business ID:", businessId); // Log the business ID for debugging
-        editDetails(businessId); // Pass the businessId to the viewDeatils function
-    });
+    $(document).on("submit", "#editForm", function (e) {
+        e.preventDefault(); // Prevent the default form submission
 
-    function editDetails(businessId){
-        console.log('Start: editing business information!');
-    }
+        const businessId = $("#editBusinessId").val();
+        const url = $("#editUrl").val();
+        const listedBy = $("#editListedBy").val();
+        const phoneNumber = $("#editPhone").val();
+        // Create location object
+    const location = {
+        city: $("#editLocation").val().split(", ")[0], // Assuming the format is "City, Province"
+        province: $("#editLocation").val().split(", ")[1], // Extract province
+        country: "Canada" // Adjust as necessary
+    };
+        const category = $("#editCategory").val();
+        const description = $("#editDescription").val();
+
+        // Prepare the data to be sent
+        const data = {
+            url: url,
+            listed_by: listedBy,
+            phone_number: phoneNumber,
+            location: location,
+            category: category,
+            description: description
+        };
+
+        // Send the AJAX request to update the business
+        $.ajax({
+            url: `http://127.0.0.1:5000/business/edit/${businessId}`,
+            method: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                alert(response.success); // Show success message
+                $("#businessList").html("");
+                $('#editModal').modal('hide'); // Hide the modal
+                loadBusiness(); // Reload the business list to reflect changes
+            },
+            error: function (xhr) {
+                const error = xhr.responseJSON ? xhr.responseJSON.error : "An error occurred";
+                alert(error); // Show error message
+            }
+        });
+    });
 });

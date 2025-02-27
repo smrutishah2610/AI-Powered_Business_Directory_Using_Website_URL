@@ -449,7 +449,7 @@ $(document).ready(function () {
             data: JSON.stringify(data),
             success: function (response) {
                 alert(response.success); // Show success message
-                $("#businessList").html("");
+                $("#businessList").empty();
                 $('#editModal').modal('hide'); // Hide the modal
                 loadBusiness(); // Reload the business list to reflect changes
             },
@@ -466,6 +466,9 @@ $(document).ready(function () {
             const provinces = new Set();
             const countries = new Set();
 
+            // for(response = business; response < 0; response++){
+
+            // }
             response.forEach(business => {
                 cities.add(business.location.city);
                 provinces.add(business.location.province);

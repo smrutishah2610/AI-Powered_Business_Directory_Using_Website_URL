@@ -114,7 +114,7 @@ def edit_business_info(business_id):
                 "website_description": description
             }}
         )
-
+        
         return jsonify({"success": "Business updated successfully!"}), 200
     except Exception as e:
         return jsonify({"error": "Failed to update business info"}), 500
@@ -148,14 +148,23 @@ def register():
     password = data.get('password')
 
     if credentials_collection.find_one({"username": username}):
-        jsonify({"message": "User already exists"});
-        return redirect('/business');
+        return jsonify({"message": "User already exists"});
 
     # hashed_password = generate_password_hash(password, method='sha256')
     credentials_collection.insert_one({"username": username, "password": password})
     return jsonify({"message": "User registered successfully"}), 200
 
-    
+@app.route('/login', methods=['POST'])
+def login():
+    print("Start: Login")
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    user = credentials_collection.find_one({"username": username, "password": password})
+    if user and (user['password'], password):
+        return jsonify({"success": "Login successful!"}), 200
+    else:
+        return jsonify({"error": "Invalid username or password"}), 401    
 
 if __name__ == "__main__":
     app.run(debug=True)

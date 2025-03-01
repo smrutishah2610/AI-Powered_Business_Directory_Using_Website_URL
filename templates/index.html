@@ -132,7 +132,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="editBusinessInfo">
-                    <form id="editForm">
+                    <form id="editForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="logo" class="form-label">Choose logo file</label>
+                                <input type="file" class="form-control" id="logo">
+                        </div>
                         <div class="mb-3">
                             <label for="editUrl" class="form-label">Business URL</label>
                             <input type="text" class="form-control" id="editUrl">

@@ -430,6 +430,17 @@ $(document).ready(function () {
         };
         const category = $("#editCategory").val();
         const description = $("#editDescription").val();
+        const logo = $("#logo")[0].files[0];
+
+        if (!logo) {
+            alert("Please select a file");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", logo);
+
+        
 
         // Prepare the data to be sent
         const data = {
@@ -438,15 +449,18 @@ $(document).ready(function () {
             phone_number: phoneNumber,
             location: location,
             category: category,
-            description: description
+            description: description,
         };
 
+        formData.append("data", JSON.stringify(data));
         // Send the AJAX request to update the business
         $.ajax({
             url: `http://127.0.0.1:5000/business/edit/${businessId}`,
             method: "PUT",
-            contentType: "application/json",
-            data: JSON.stringify(data),
+            processData: false,
+            contentType: false,
+            // contentType: "application/json",
+            data: formData,
             success: function (response) {
                 alert(response.success); // Show success message
                 $("#businessList").empty();

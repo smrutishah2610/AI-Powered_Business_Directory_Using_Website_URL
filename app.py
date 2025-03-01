@@ -1,3 +1,5 @@
+import json
+import os
 from flask import Flask, redirect, render_template, request, jsonify
 from flask_cors import CORS
 from mongoClient import (
@@ -9,6 +11,7 @@ from mongoClient import (
 )
 from main import scrape_and_store
 import tkinter as tk
+from werkzeug.utils import secure_filename
 
 
 
@@ -94,7 +97,8 @@ def delete_business(business_id):
 @app.route('/business/edit/<business_id>', methods=["PUT"])
 def edit_business_info(business_id):
     try:
-        data = request.json
+        data = request.form
+        logo = request.files.get("logo")
         url = data.get("url")
         listed_by = data.get("listed_by")
         phone_number = data.get("phone_number")
@@ -102,10 +106,24 @@ def edit_business_info(business_id):
         category = data.get("category")
         description = data.get("description")
 
+        # if "file" not in request.files:
+        #     return jsonify({"error": "No file part"}), 400
+
+        # logo = request.files["file"]
+
+        # if logo.filename == "":
+        #     return jsonify({"error": "No selected file"}), 400
+
+        if logo:
+            filename = secure_filename(logo.filename)
+            file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            logo.save(file_path)
+
         # Update the business in the database
         collection.update_one(
             {"_id": ObjectId(business_id)},
             {"$set": {
+                "logo": logo,
                 "url": url,
                 "listed_by": listed_by,
                 "contact_number": phone_number,
@@ -161,7 +179,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
     user = credentials_collection.find_one({"username": username, "password": password})
-    if user and (user['password'], password):
+    if user and (user['password'] == password):
         return jsonify({"success": "Login successful!"}), 200
     else:
         return jsonify({"error": "Invalid username or password"}), 401    

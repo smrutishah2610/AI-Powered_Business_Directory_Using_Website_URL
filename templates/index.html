@@ -132,14 +132,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="editBusinessInfo">
-                    <form id="editForm" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="logo" class="form-label">Choose logo file</label>
-                                <input type="file" class="form-control" id="logo">
-                        </div>
+                    <form id="editForm">
                         <div class="mb-3">
                             <label for="editUrl" class="form-label">Business URL</label>
                             <input type="text" class="form-control" id="editUrl">
+                        </div>
+                        <div class="mb-3">
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <input type="file" class="form-control" name="file" id="fileInput">
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                            </form>
+                            <p id="responseMessage"></p>
                         </div>
                         <div class="mb-3">
                             <label for="editWebsiteName" class="form-label">Business Name</label>

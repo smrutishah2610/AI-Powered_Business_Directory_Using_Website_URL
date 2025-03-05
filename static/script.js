@@ -430,17 +430,6 @@ $(document).ready(function () {
         };
         const category = $("#editCategory").val();
         const description = $("#editDescription").val();
-        const logo = $("#logo")[0].files[0];
-
-        if (!logo) {
-            alert("Please select a file");
-            return;
-        }
-
-        let formData = new FormData();
-        formData.append("file", logo);
-
-        
 
         // Prepare the data to be sent
         const data = {
@@ -449,18 +438,15 @@ $(document).ready(function () {
             phone_number: phoneNumber,
             location: location,
             category: category,
-            description: description,
+            description: description
         };
 
-        formData.append("data", JSON.stringify(data));
         // Send the AJAX request to update the business
         $.ajax({
             url: `http://127.0.0.1:5000/business/edit/${businessId}`,
             method: "PUT",
-            processData: false,
-            contentType: false,
-            // contentType: "application/json",
-            data: formData,
+            contentType: "application/json",
+            data: JSON.stringify(data),
             success: function (response) {
                 alert(response.success); // Show success message
                 $("#businessList").empty();
@@ -473,6 +459,36 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Upload Logo Image
+    $(document).on("submit","#uploadForm"), function(event) {
+        event.preventDefault();
+        console.log("Start: Logo Function starts from here.")
+        let fileInput = document.getElementById("fileInput").files[0];
+
+        if(!fileInput){
+            alert("Please select a file");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", fileInput);
+
+        let response = fetch(`http://127.0.0.1:5000/business/edit/${businessId}/logo`, {
+            method: "POST",
+            body: formData,
+        });
+
+        let result = response.json();
+        document.getElementById("responseMessage").innerText = result.message || result.error;
+
+        if(result.url){
+            let link = document.createElement("a");
+            link.href = result.url;
+            link.innerText = "View Uploaded Logo";
+            document.getElementById("responseMessage").appendChild(link);
+        }
+    };
 
     function loadLocationFilters() {
         $.get("http://127.0.0.1:5000/business", function (response) {

@@ -1,5 +1,5 @@
+import json
 import os
-import boto3
 from flask import Flask, redirect, render_template, request, jsonify
 from flask_cors import CORS
 from mongoClient import (
@@ -22,22 +22,6 @@ app = Flask(__name__)
 print("Start: app")
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow only this origin
 # cors = CORS(app)
-
-# AWS S# Configuration
-# AWS_ACCESS_KEY = ""
-# AWS_SECRET_KEY = ""
-# AWS_BUCKET_NAME = ""
-# AWS_REGION = ""
-
-# S3 Initialize client
-# s3_client = boto3.client(
-#     "s3",
-#     AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY,
-#     AWS_SECRET_ACCESS_KEY = AWS_SECRET_KEY,
-#     region_name = AWS_REGION,
-# )
-
-
 
 @app.route("/business")
 def home():
@@ -109,12 +93,12 @@ def delete_business(business_id):
         return jsonify({"error": "Business not found"}), 404
     except Exception as e:
         return jsonify({"error": "Failed to load business details"}), e
-
-# Update/Edit Business details
+        
 @app.route('/business/edit/<business_id>', methods=["PUT"])
 def edit_business_info(business_id):
     try:
-        data = request.json
+        data = request.form
+        logo = request.files.get("logo")
         url = data.get("url")
         listed_by = data.get("listed_by")
         phone_number = data.get("phone_number")
@@ -122,10 +106,24 @@ def edit_business_info(business_id):
         category = data.get("category")
         description = data.get("description")
 
+        # if "file" not in request.files:
+        #     return jsonify({"error": "No file part"}), 400
+
+        # logo = request.files["file"]
+
+        # if logo.filename == "":
+        #     return jsonify({"error": "No selected file"}), 400
+
+        if logo:
+            filename = secure_filename(logo.filename)
+            file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            logo.save(file_path)
+
         # Update the business in the database
         collection.update_one(
             {"_id": ObjectId(business_id)},
             {"$set": {
+                "logo": logo,
                 "url": url,
                 "listed_by": listed_by,
                 "contact_number": phone_number,
@@ -138,31 +136,7 @@ def edit_business_info(business_id):
         return jsonify({"success": "Business updated successfully!"}), 200
     except Exception as e:
         return jsonify({"error": "Failed to update business info"}), 500
-
-# Update/Edit Business LOGO
-UPLOAD_FOLDER = "uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-# Check: Is upload directory exists?
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-@app.route('/business/edit/<business_id>/logo', methods=["POST"])
-def upload_file(business_id):
-    if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
     
-    file = request.files["file"]
-    
-    if file.filename == "":
-        return jsonify({"error":"No selected file"}), 400
-    
-    if file:
-        filename = secure_filename(f"{business_id}_{file.filename}")
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(file_path)
-        
-        return jsonify({"message": "File uploaded successfully", "file_path": file_path})
     
 @app.route("/")
 def index():
@@ -205,7 +179,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
     user = credentials_collection.find_one({"username": username, "password": password})
-    if user and (user['password'], password):
+    if user and (user['password'] == password):
         return jsonify({"success": "Login successful!"}), 200
     else:
         return jsonify({"error": "Invalid username or password"}), 401    
